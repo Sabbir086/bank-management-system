@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import type { FormEvent, ReactNode } from "react";
 import {
-  Activity, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Bell, BriefcaseBusiness,
+  Activity, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ArrowRight, Bell, BriefcaseBusiness,
   Check, CheckCircle2, ChevronDown, ChevronRight, CreditCard, Download, FileClock, FileText,
   HandCoins, LayoutDashboard, LogOut, Menu, MoreHorizontal, Plus, RefreshCw, Search, Settings,
-  ShieldAlert, ShieldCheck, UserRound, Users, Wallet, X, Banknote, LockKeyhole,
+  ShieldAlert, ShieldCheck, UserRound, Users, Wallet, X, Banknote, LockKeyhole, Sparkles, BadgeCheck,
 } from "lucide-react";
 import {
   Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
@@ -97,8 +98,111 @@ function Field({ label, children, hint }: { label: string; children: ReactNode; 
   return <label className="form-field"><span>{label}</span>{children}{hint && <small>{hint}</small>}</label>;
 }
 
-function LoginScreen({ onLogin }: { onLogin: (email: string, password: string) => Promise<void> }) {
-  const [mode, setMode] = useState<"login" | "register">("login");
+function Brand({ light = false }: { light?: boolean }) {
+  return <div className={`brand-lockup ${light ? "brand-lockup-light" : ""}`}>
+    <Image
+      src="/brand/confused-bank-full-logo.svg"
+      alt="Confused Bank — Smarter Banking, Made Simple"
+      width={1265}
+      height={345}
+      priority
+      className="brand-lockup-logo"
+    />
+  </div>;
+}
+
+function LandingScreen({ onLogin, onRegister }: { onLogin: () => void; onRegister: () => void }) {
+  return <main className="hero-screen hero-screen-light">
+    <div className="hero-glow hero-glow-one" aria-hidden="true" />
+    <div className="hero-glow hero-glow-two" aria-hidden="true" />
+
+    <header className="hero-nav">
+      <Brand />
+      <nav className="hero-nav-links" aria-label="Main navigation">
+        <a href="#experience">The experience</a>
+        <a href="#security">Security</a>
+        <a href="#features">Features</a>
+        <a href="#features">Pricing</a>
+      </nav>
+      <div className="hero-nav-actions">
+        <button className="hero-nav-login" onClick={onLogin}>Sign in</button>
+        <button className="hero-nav-cta" onClick={onRegister}>Open an account <ArrowRight size={16} /></button>
+      </div>
+    </header>
+
+    <section className="hero-main" id="experience">
+      <div className="hero-copy">
+        <div className="hero-kicker"><span className="hero-kicker-dot" /> A CLEARER WAY TO BANK</div>
+        <h1>Make every<br />money move<br /><em>count.</em></h1>
+        <p className="hero-description">A smarter banking workspace for everyday customers and the people who keep banking moving. Clear insights, simple actions and a secure place to manage it all.</p>
+        <div className="hero-actions">
+          <button className="hero-primary" onClick={onLogin}>Explore your banking <ArrowRight size={18} /></button>
+          <button className="hero-secondary" onClick={onRegister}>Create an account</button>
+        </div>
+        <div className="hero-trust-row" id="security">
+          <span><ShieldCheck size={18} /> Secure sign-in</span>
+          <i />
+          <span><LayersIcon /> Role-based access</span>
+          <i />
+          <span><Activity size={18} /> Clear activity</span>
+        </div>
+      </div>
+
+      <div className="hero-visual" aria-label="Illustrative Confused Bank dashboard preview">
+        <div className="hero-orbit hero-orbit-a" />
+        <div className="hero-orbit hero-orbit-b" />
+        <div className="hero-preview-card">
+          <div className="preview-topline">
+            <span className="preview-brand"><span className="preview-brand-icon"><Image src="/brand/confused-bank-emblem.svg" alt="" aria-hidden="true" width={441} height={488} /></span><strong>Confused Bank</strong></span>
+            <span className="preview-live"><i /> Live banking</span>
+          </div>
+          <div className="preview-dashboard-body">
+            <div className="preview-account">
+              <div className="preview-balance-label">Your financial space</div>
+              <div className="preview-total-label">Sample account balance</div>
+              <div className="preview-balance">BDT 1,311,025.00</div>
+              <div className="preview-demo-note">Illustrative dashboard preview</div>
+            </div>
+            <div className="preview-chart" aria-hidden="true"><span /><span /><span /><span /></div>
+          </div>
+          <div className="preview-quick-actions" aria-label="Example banking actions">
+            <div className="preview-action"><ArrowUpRight size={22} /><span>Send<br />Money</span></div>
+            <div className="preview-action"><ArrowDownLeft size={22} /><span>Receive<br />Money</span></div>
+            <div className="preview-action"><FileText size={21} /><span>Pay Bill</span></div>
+            <div className="preview-action"><ArrowLeftRight size={22} /><span>Transfer</span></div>
+          </div>
+        </div>
+        <div className="hero-float-card hero-float-security">
+          <span className="float-icon"><ShieldCheck size={21} /></span>
+          <span><strong>Security first</strong><small>Your account, protected</small></span>
+        </div>
+        <div className="hero-float-card hero-float-activity">
+          <span className="float-icon float-icon-light"><Activity size={22} /></span>
+          <span><strong>Clear insights</strong><small>Track, manage, and grow</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section className="hero-feature-row" id="features" aria-label="Platform highlights">
+      <article><span className="hero-feature-icon"><Wallet size={23} /></span><div><strong>Everyday banking</strong><small>Accounts and transactions in one view</small></div></article>
+      <article><span className="hero-feature-icon"><Activity size={23} /></span><div><strong>Useful insights</strong><small>Understand activity at a glance</small></div></article>
+      <article><span className="hero-feature-icon"><LockKeyhole size={23} /></span><div><strong>Protected access</strong><small>Tools tailored to your role</small></div></article>
+      <article><span className="hero-feature-icon"><Users size={23} /></span><div><strong>Built for everyone</strong><small>Simple, reliable and easy to use</small></div></article>
+    </section>
+    <footer className="hero-footer"><span>© {new Date().getFullYear()} Confused Bank</span><span>Smarter banking, made simple <i /> Secure banking workspace</span></footer>
+  </main>;
+}
+
+function LayersIcon() {
+  return <span className="layers-icon" aria-hidden="true"><span /><span /><span /></span>;
+}
+
+function LoginScreen({ onLogin, initialMode, onBack }: {
+  onLogin: (email: string, password: string) => Promise<void>;
+  initialMode: "login" | "register";
+  onBack: () => void;
+}) {
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -122,23 +226,36 @@ function LoginScreen({ onLogin }: { onLogin: (email: string, password: string) =
     } catch (e) { setError(getError(e)); }
     finally { setBusy(false); }
   };
-  return <main className="login-screen"><div className="login-decoration login-decoration-one" /><div className="login-decoration login-decoration-two" />
-    <div className="login-brand"><div className="brand-mark"><Wallet size={22} /></div><div><strong>Confused<span> Bank</span></strong><small>BANKING PLATFORM</small></div></div>
-    <div className="login-card"><div className="login-card-top"><div className="login-symbol"><LockKeyhole size={23} /></div><span className="secure-label"><i /> SECURE {mode === "login" ? "SIGN IN" : "REGISTRATION"}</span></div>
-      <p className="login-eyebrow">{mode === "login" ? "WELCOME BACK" : "JOIN CONFUSED BANK"}</p><h1>{mode === "login" ? "Sign in to your workspace" : "Create a customer account"}</h1><p className="login-description">{mode === "login" ? "Access your banking workspace with your registered credentials." : "Register as a customer. Identity verification is required before opening accounts or applying for loans."}</p>
-      <form onSubmit={submit} className="login-form">
-        {mode === "register" && <Field label="Full name"><input value={fullName} onChange={(e) => setFullName(e.target.value)} required maxLength={100} autoComplete="name" placeholder="Your full name" /></Field>}
-        <Field label="Email address"><input type="email" autoComplete="username" required placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={150} /></Field>
-        <Field label="Password"><div className="password-input"><input type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={mode === "register" ? 8 : undefined} maxLength={72} placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} /><button type="button" onClick={() => setShowPassword((v) => !v)}>{showPassword ? "Hide" : "Show"}</button></div></Field>
-        {mode === "register" && <><Field label="Phone (optional)"><input value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} placeholder="Phone number" /></Field><Field label="National ID (optional)"><input value={nationalId} onChange={(e) => setNationalId(e.target.value)} maxLength={30} placeholder="National ID" /></Field><Field label="Address (optional)"><input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={255} placeholder="Current address" /></Field></>}
-        {error && <div className="form-error"><ShieldAlert size={16} />{error}</div>}
-        {success && <div className="form-success"><CheckCircle2 size={16} />{success}</div>}
-        <button className="button button-primary login-submit" disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Sign in securely" : "Create customer account"}<ChevronRight size={17} /></button>
-      </form>
-      <button className="auth-switch" onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(""); setSuccess(""); }}>{mode === "login" ? "New to Confused Bank? Create a customer account" : "Already registered? Sign in"}</button>
-      <div className="login-foot"><ShieldCheck size={15} /> Protected with secure token-based authentication</div>
-    </div>
-    <div className="login-bottom">© {new Date().getFullYear()} Confused Bank · Banking Management System <span>Academic banking simulation</span></div>
+  return <main className="auth-screen">
+    <div className="auth-background-glow auth-background-glow-one" />
+    <div className="auth-background-glow auth-background-glow-two" />
+    <header className="auth-topbar"><button className="auth-back-button" onClick={onBack}><ArrowRight size={15} className="auth-back-icon" /> Back to home</button><Brand /></header>
+    <section className="auth-layout">
+      <div className="auth-story">
+        <div className="auth-story-kicker"><span /> YOUR MONEY. YOUR MOMENTUM.</div>
+        <h1>{mode === "login" ? <>Welcome back to<br /><em>better banking.</em></> : <>Start with a<br /><em>stronger account.</em></>}</h1>
+        <p>{mode === "login" ? "Sign in to your secure workspace and pick up right where you left off." : "Create your customer profile to begin your banking journey with Confused Bank."}</p>
+        <div className="auth-benefits"><span><ShieldCheck size={17} /> Secure token-based access</span><span><Activity size={17} /> Clear account activity</span><span><Sparkles size={17} /> A simpler banking experience</span></div>
+        <div className="auth-story-note"><span className="auth-note-mark"><Image src="/brand/confused-bank-emblem.svg" alt="" aria-hidden="true" width={441} height={488} /></span><span><strong>Banking, made more human.</strong><small>Thoughtful tools for everyday financial tasks.</small></span></div>
+      </div>
+
+      <div className="login-card auth-card">
+        <div className="auth-card-header"><div><div className="login-eyebrow">{mode === "login" ? "SECURE ACCESS" : "CUSTOMER REGISTRATION"}</div><h2>{mode === "login" ? "Sign in to your account" : "Create your account"}</h2><p>{mode === "login" ? "Enter your details to access your workspace." : "A few details to set up your customer profile."}</p></div><div className="login-symbol"><LockKeyhole size={22} /></div></div>
+        <div className="auth-mode-switch" role="group" aria-label="Authentication mode"><button type="button" className={mode === "login" ? "auth-mode-active" : ""} onClick={() => { setMode("login"); setError(""); setSuccess(""); }}>Sign in</button><button type="button" className={mode === "register" ? "auth-mode-active" : ""} onClick={() => { setMode("register"); setError(""); setSuccess(""); }}>Register</button></div>
+        <form onSubmit={submit} className="login-form">
+          {mode === "register" && <Field label="Full name"><input value={fullName} onChange={(e) => setFullName(e.target.value)} required maxLength={100} autoComplete="name" placeholder="Your full name" /></Field>}
+          <Field label="Email address"><input type="email" autoComplete="username" required placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={150} /></Field>
+          <Field label="Password"><div className="password-input"><input type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={mode === "register" ? 8 : undefined} maxLength={72} placeholder={mode === "login" ? "Enter your password" : "Create a password (8+ characters)"} value={password} onChange={(e) => setPassword(e.target.value)} /><button type="button" onClick={() => setShowPassword((v) => !v)}>{showPassword ? "Hide" : "Show"}</button></div></Field>
+          {mode === "register" && <div className="register-extra-fields"><Field label="Phone number · optional"><input value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} autoComplete="tel" placeholder="Your phone number" /></Field><Field label="National ID · optional"><input value={nationalId} onChange={(e) => setNationalId(e.target.value)} maxLength={30} placeholder="National ID number" /></Field><Field label="Address · optional"><input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={255} autoComplete="street-address" placeholder="Current address" /></Field></div>}
+          {error && <div className="form-error" role="alert"><ShieldAlert size={16} />{error}</div>}
+          {success && <div className="form-success" role="status"><CheckCircle2 size={16} />{success}</div>}
+          <button className="button button-primary login-submit" disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Sign in securely" : "Create customer account"}<ArrowRight size={17} /></button>
+        </form>
+        <div className="login-foot"><ShieldCheck size={15} /> Protected with secure token-based authentication</div>
+        <p className="auth-card-note">{mode === "login" ? "New to Confused Bank? Use Register to create a customer account." : "Already have an account? Choose Sign in above."}</p>
+      </div>
+    </section>
+    <footer className="auth-footer"><span>© {new Date().getFullYear()} Confused Bank</span><span>Secure access <i /> Academic banking simulation</span></footer>
   </main>;
 }
 
@@ -146,6 +263,7 @@ export default function BankApp() {
   const [session, setSession] = useState<SessionData | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [booting, setBooting] = useState(true);
+  const [authScreen, setAuthScreen] = useState<"hero" | "login" | "register">("hero");
   const [activeView, setActiveView] = useState<ViewName>("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -168,6 +286,8 @@ export default function BankApp() {
   const [repaymentHistory, setRepaymentHistory] = useState<LoanRepayment[]>([]);
   const [repaymentLoan, setRepaymentLoan] = useState<Loan | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const [modal, setModal] = useState<"staff" | "account" | null>(null);
 
   const role = profile?.role;
@@ -176,8 +296,24 @@ export default function BankApp() {
 
   const signOut = useCallback(() => {
     clearSession(); setSession(null); setProfile(null); setOverview(null);
-    setActiveView("Dashboard"); setNotifications([]); setShowNotifications(false);
+    setAuthScreen("hero"); setActiveView("Dashboard"); setNotifications([]); setShowNotifications(false); setShowProfileMenu(false);
   }, []);
+
+  useEffect(() => {
+    if (!showProfileMenu) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node)) setShowProfileMenu(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowProfileMenu(false);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showProfileMenu]);
 
   useEffect(() => {
     let active = true;
@@ -384,8 +520,11 @@ export default function BankApp() {
   const selectView = (view: ViewName) => { setActiveView(view); setSidebarOpen(false); setError(""); setNotice(""); setSearch(""); };
   const searchFilter = <T,>(values: T[]): T[] => values.filter((item) => JSON.stringify(item).toLowerCase().includes(search.trim().toLowerCase()));
 
-  if (booting) return <main className="boot-screen"><div className="brand-mark"><Wallet size={22} /></div><span className="loader" /> Securing your workspace…</main>;
-  if (!session || !profile) return <LoginScreen onLogin={handleLogin} />;
+  if (booting) return <main className="boot-screen"><div className="brand-mark boot-brand-mark"><Image src="/brand/confused-bank-emblem.svg" alt="" aria-hidden="true" width={441} height={488} /></div><span className="loader" /> Securing your workspace…</main>;
+  if (!session || !profile) {
+    if (authScreen === "hero") return <LandingScreen onLogin={() => setAuthScreen("login")} onRegister={() => setAuthScreen("register")} />;
+    return <LoginScreen key={authScreen} onLogin={handleLogin} initialMode={authScreen === "register" ? "register" : "login"} onBack={() => setAuthScreen("hero")} />;
+  }
 
   const renderDashboard = () => {
     const isAdmin = role === "ADMIN";
@@ -552,18 +691,17 @@ export default function BankApp() {
   return <main className="bank-shell">
     {sidebarOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
     <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
-      <div className="brand-row"><div className="brand-mark"><Wallet size={21} strokeWidth={2.3} /></div><div className="brand-copy"><span className="brand-name">Confused<span> Bank</span></span><span className="brand-caption">BANKING PLATFORM</span></div><button className="sidebar-close icon-button" aria-label="Close menu" onClick={() => setSidebarOpen(false)}><X size={18} /></button></div>
-      <div className="workspace-switcher"><div className="workspace-icon">CB</div><div className="workspace-copy"><strong>Confused Bank</strong><span>{rolesLabel[profile.role]}</span></div><ChevronDown size={15} className="muted-icon" /></div>
+      <div className="brand-row"><Image src="/brand/confused-bank-emblem.svg" alt="Confused Bank emblem" width={441} height={488} priority className="sidebar-brand-emblem" /><div className="brand-copy"><span className="brand-name">Confused<span> Bank</span></span><span className="brand-caption">BANKING PLATFORM</span></div><button className="sidebar-close icon-button" aria-label="Close menu" onClick={() => setSidebarOpen(false)}><X size={18} /></button></div>
+      <div className="workspace-switcher"><div className="workspace-icon"><Image src="/brand/confused-bank-emblem.svg" alt="" aria-hidden="true" width={441} height={488} /></div><div className="workspace-copy"><strong>Confused Bank</strong><span>{rolesLabel[profile.role]}</span></div><ChevronDown size={15} className="muted-icon" /></div>
       <div className="nav-section-label">WORKSPACE</div><nav className="main-nav" aria-label="Main navigation">{navItems.map(({ label, icon: Icon }) => <button key={label} className={`nav-link ${activeView === label ? "nav-link-active" : ""}`} onClick={() => selectView(label)}><Icon size={18} strokeWidth={1.9} /><span>{label}</span>{label === "Notifications" && unreadCount > 0 && <span className="nav-count">{unreadCount}</span>}</button>)}</nav>
-      <div className="nav-section-label tools-label">ACCOUNT</div><nav className="main-nav"><button className={`nav-link ${activeView === "My profile" ? "nav-link-active" : ""}`} onClick={() => selectView("My profile")}><Settings size={18} /><span>My profile</span></button><button className="nav-link" onClick={signOut}><LogOut size={18} /><span>Sign out</span></button></nav>
-      <div className="sidebar-bottom"><div className="upgrade-card"><div className="upgrade-icon"><ShieldCheck size={17} /></div><strong>Secure workspace</strong><p>Your session uses temporary browser session storage and bearer-token API access.</p><span className="secure-sidebar-label"><i /> SESSION ACTIVE</span></div><div className="sidebar-user"><div className="avatar avatar-admin">{initials(profile.fullName)}</div><div className="user-copy"><strong>{profile.fullName}</strong><span>{rolesLabel[profile.role]}</span></div><button className="user-more icon-button" aria-label="Sign out" onClick={signOut}><MoreHorizontal size={19} /></button></div></div>
+      <div className="sidebar-bottom"><div className="upgrade-card"><div className="upgrade-icon"><ShieldCheck size={17} /></div><strong>Secure workspace</strong><p>Your session uses temporary browser session storage and bearer-token API access.</p><span className="secure-sidebar-label"><i /> SESSION ACTIVE</span></div><div className="sidebar-user"><div className="avatar avatar-admin">{initials(profile.fullName)}</div><div className="user-copy"><strong>{profile.fullName}</strong><span>{rolesLabel[profile.role]}</span></div></div></div>
     </aside>
-    <section className="main-area"><header className="topbar"><div className="topbar-left"><button className="mobile-menu icon-button" aria-label="Open menu" onClick={() => setSidebarOpen(true)}><Menu size={21} /></button><div className="breadcrumb">Workspace <ChevronRight size={14} /> <strong>{activeView}</strong></div></div><div className="topbar-actions"><label className="search-box"><Search size={17} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search this view…" aria-label="Search current view" /><kbd>⌘ K</kbd></label><div className="notification-wrap"><button className="icon-button notification-button" aria-label="Notifications" onClick={() => { setShowNotifications((v) => !v); if (activeView !== "Notifications") selectView("Notifications"); }}><Bell size={19} />{unreadCount > 0 && <i />}</button>{showNotifications && <div className="notification-popover"><strong>{unreadCount} unread notifications</strong><p>Open the Notifications section to review updates.</p><button className="inline-link" onClick={() => { setShowNotifications(false); selectView("Notifications"); }}>View notifications</button></div>}</div><div className="topbar-divider" /><button className="profile-button" onClick={() => selectView("My profile")}><div className="avatar avatar-small">{initials(profile.fullName)}</div><span><strong>{profile.fullName}</strong><small>{rolesLabel[profile.role]}</small></span><ChevronDown size={15} /></button></div></header>
+    <section className="main-area"><header className="topbar"><div className="topbar-left"><button className="mobile-menu icon-button" aria-label="Open menu" onClick={() => setSidebarOpen(true)}><Menu size={21} /></button><div className="breadcrumb">Workspace <ChevronRight size={14} /> <strong>{activeView}</strong></div></div><div className="topbar-actions"><label className="search-box"><Search size={17} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search this view…" aria-label="Search current view" /><kbd>⌘ K</kbd></label><div className="notification-wrap"><button className="icon-button notification-button" aria-label="Notifications" onClick={() => { setShowNotifications((v) => !v); if (activeView !== "Notifications") selectView("Notifications"); }}><Bell size={19} />{unreadCount > 0 && <i />}</button>{showNotifications && <div className="notification-popover"><strong>{unreadCount} unread notifications</strong><p>Open the Notifications section to review updates.</p><button className="inline-link" onClick={() => { setShowNotifications(false); selectView("Notifications"); }}>View notifications</button></div>}</div><div className="topbar-divider" /><div className="profile-menu-wrap" ref={profileMenuRef}><button type="button" className="profile-button" aria-haspopup="menu" aria-expanded={showProfileMenu} onClick={() => setShowProfileMenu((open) => !open)}><div className="avatar avatar-small">{initials(profile.fullName)}</div><span><strong>{profile.fullName}</strong><small>{rolesLabel[profile.role]}</small></span><ChevronDown size={15} className={showProfileMenu ? "profile-chevron profile-chevron-open" : "profile-chevron"} /></button>{showProfileMenu && <div className="profile-dropdown" role="menu" aria-label="Account menu"><button type="button" role="menuitem" onClick={() => { setShowProfileMenu(false); selectView("My profile"); }}><UserRound size={16} /><span>Profile</span></button><div className="profile-dropdown-divider" /><button type="button" role="menuitem" className="profile-dropdown-signout" onClick={signOut}><LogOut size={16} /><span>Sign out</span></button></div>}</div></div></header>
       <div className="content-wrap"><div className="content-status-row"><span><span className="live-dot" /> Connected to banking API</span><button className="refresh-link" onClick={() => setReloadKey((v) => v + 1)}><RefreshCw size={13} /> Refresh</button></div>
         {error && <div className="global-alert global-alert-error"><ShieldAlert size={16} /><span>{error}</span><button onClick={() => setError("")} aria-label="Dismiss error"><X size={15} /></button></div>}
         {notice && <div className="global-alert global-alert-success"><CheckCircle2 size={16} /><span>{notice}</span><button onClick={() => setNotice("")} aria-label="Dismiss notice"><X size={15} /></button></div>}
         {loading && activeView !== "Dashboard" && <LoadingBlock />}
-        {content}
+        <div key={activeView} className="view-transition">{content}</div>
         <footer className="page-footer"><span>© {new Date().getFullYear()} Confused Bank · Banking Management System</span><span><i className="live-dot footer-status" /> Secure API session <span className="footer-divider">·</span> {profile.role}</span></footer>
       </div>
     </section>
